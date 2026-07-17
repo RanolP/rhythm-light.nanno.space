@@ -1,0 +1,15 @@
+pre-push:
+  parallel: true
+  jobs:
+    - run: pnpm check:lint
+    - run: pnpm check:fmt
+    - run: pnpm check:types
+
+pre-commit:
+  parallel: true
+  jobs:
+    - run: pnpm fix:lint {staged_files} && pnpm fix:fmt {staged_files}
+      glob: "*.{js,ts,jsx,tsx,json,css}"
+      stage_fixed: true
+    - run: pnpm check:types
+      glob: "*.{js,ts,jsx,tsx}"

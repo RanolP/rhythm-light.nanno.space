@@ -1,0 +1,21 @@
+{
+  "name": "rhythm-light.nanno.space",
+  "private": true,
+  "scripts": {
+    "postinstall": "lefthook install",
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "check:lint": "oxlint",
+    "fix:lint": "oxlint --fix",
+    "check:fmt": "oxfmt --check",
+    "fix:fmt": "oxfmt",
+    "check:types": "turbo run check:types"
+  },
+  "devDependencies": {
+    "lefthook": "^2.1.10",
+    "oxfmt": "^0.59.0",
+    "oxlint": "^1.74.0",
+    "turbo": "^2.10.5"
+  },
+  "packageManager": "pnpm@10.29.3"
+}
