@@ -18,7 +18,7 @@ const gameRenderCtx = gameCanvas.getContext("2d")!;
 let recentDtSamples: number[] = [];
 function tick(dtMillis: number) {
   gameRenderCtx.fillStyle = "white";
-  gameRenderCtx.fillRect(...SOURCE_RESOLUTION.topLeft, ...SOURCE_RESOLUTION.bottomRight);
+  gameRenderCtx.fillRect(0, 0, widthOf(SOURCE_RESOLUTION), heightOf(SOURCE_RESOLUTION));
   const world = {
     renderCtx: gameRenderCtx,
     viewport: SOURCE_RESOLUTION,
@@ -34,10 +34,62 @@ function tick(dtMillis: number) {
       data: {
         content: `${(1000 / (recentDtSamples.reduce((a, b) => a + b) / recentDtSamples.length)) | 0}fps`,
         pos: [0, 0],
+        fontFamily: "Pretendard",
+        fontSize: 128,
+        fill: "red",
+        anchor: [HorizontalAlignment.CENTER, VerticalAlignment.MIDDLE],
+        align: [HorizontalAlignment.CENTER, VerticalAlignment.BOTTOM],
+      },
+    },
+    {
+      kind: "box",
+      data: {
+        dim: { topLeft: [0, 0], bottomRight: [100, 128] },
+        outline: { fill: "red", width: 4 },
+        anchor: [HorizontalAlignment.CENTER, VerticalAlignment.MIDDLE],
+        align: [HorizontalAlignment.CENTER, VerticalAlignment.BOTTOM],
+      },
+    },
+    {
+      kind: "text",
+      data: {
+        content: `${(1000 / (recentDtSamples.reduce((a, b) => a + b) / recentDtSamples.length)) | 0}fps`,
+        pos: [0, 0],
+        fontFamily: "Pretendard",
         fontSize: 128,
         fill: "green",
         anchor: [HorizontalAlignment.CENTER, VerticalAlignment.MIDDLE],
         align: [HorizontalAlignment.CENTER, VerticalAlignment.MIDDLE],
+      },
+    },
+    {
+      kind: "box",
+      data: {
+        dim: { topLeft: [0, 0], bottomRight: [100, 128] },
+        outline: { fill: "green", width: 4 },
+        anchor: [HorizontalAlignment.CENTER, VerticalAlignment.MIDDLE],
+        align: [HorizontalAlignment.CENTER, VerticalAlignment.MIDDLE],
+      },
+    },
+    {
+      kind: "text",
+      data: {
+        content: `${(1000 / (recentDtSamples.reduce((a, b) => a + b) / recentDtSamples.length)) | 0}fps`,
+        pos: [0, 0],
+        fontFamily: "Pretendard",
+        fontSize: 128,
+        fill: "blue",
+        anchor: [HorizontalAlignment.CENTER, VerticalAlignment.MIDDLE],
+        align: [HorizontalAlignment.CENTER, VerticalAlignment.TOP],
+      },
+    },
+    {
+      kind: "box",
+      data: {
+        dim: { topLeft: [0, 0], bottomRight: [100, 128] },
+        outline: { fill: "blue", width: 4 },
+        anchor: [HorizontalAlignment.CENTER, VerticalAlignment.MIDDLE],
+        align: [HorizontalAlignment.CENTER, VerticalAlignment.TOP],
       },
     },
   ] satisfies DrawCall[];
@@ -57,11 +109,11 @@ function tick(dtMillis: number) {
   renderCtx.drawImage(gameCanvas, (target.width - dw) / 2, (target.height - dh) / 2, dw, dh);
 }
 
-function main(prev: number, now: number) {
-  tick(now - prev);
-  requestAnimationFrame(() => {
-    main(now, Date.now());
-  });
+let last = performance.now();
+function frame(now: number) {
+  tick(now - last);
+  last = now;
+  requestAnimationFrame(frame);
 }
 
-main(Date.now(), Date.now());
+frame(performance.now());

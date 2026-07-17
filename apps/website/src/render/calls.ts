@@ -1,3 +1,4 @@
+import type { Dimension2D } from "../shared/data/dimension";
 import type { Alignment, Pos2D } from "../shared/data/position";
 
 type DrawCallBase<Name extends string, Content extends {}> = {
@@ -19,4 +20,15 @@ export type DrawTextCall = DrawCallBase<
   }
 >;
 
-export type DrawCall = DrawTextCall;
+export type DrawBox = DrawCallBase<
+  "box",
+  {
+    dim: Dimension2D;
+    anchor: Alignment;
+    align?: Alignment;
+    fill?: string;
+    outline?: { fill: string; width: number };
+  }
+>;
+
+export type DrawCall = DrawTextCall | DrawBox;
