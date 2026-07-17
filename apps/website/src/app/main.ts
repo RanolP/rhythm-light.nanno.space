@@ -1,0 +1,67 @@
+import type { DrawCall } from "../render/calls";
+import { executeDrawCalls } from "../render/executor";
+import type { World } from "../render/world";
+import { heightOf, widthOf, type Dimension2D } from "../shared/data/dimension";
+import { HorizontalAlignment, VerticalAlignment } from "../shared/data/position";
+import { configureLogger } from "../shared/logger";
+
+// #region Setup
+const canvas = document.querySelector<HTMLCanvasElement>("canvas#main")!;
+const renderCtx = canvas.getContext("2d")!;
+await configureLogger();
+// #endregion
+
+const SOURCE_RESOLUTION = { topLeft: [0, 0], bottomRight: [1920, 1080] } satisfies Dimension2D;
+
+const gameCanvas = new OffscreenCanvas(widthOf(SOURCE_RESOLUTION), heightOf(SOURCE_RESOLUTION));
+const gameRenderCtx = gameCanvas.getContext("2d")!;
+let recentDtSamples: number[] = [];
+function tick(dtMillis: number) {
+  gameRenderCtx.fillStyle = "white";
+  gameRenderCtx.fillRect(...SOURCE_RESOLUTION.topLeft, ...SOURCE_RESOLUTION.bottomRight);
+  const world = {
+    renderCtx: gameRenderCtx,
+    viewport: SOURCE_RESOLUTION,
+    dtMillis,
+  } satisfies World;
+
+  recentDtSamples.push(dtMillis);
+  if (recentDtSamples.length > 20) recentDtSamples.splice(0, 1);
+
+  const drawCalls = [
+    {
+      kind: "text",
+      data: {
+        content: `${(1000 / (recentDtSamples.reduce((a, b) => a + b) / recentDtSamples.length)) | 0}fps`,
+        pos: [0, 0],
+        fontSize: 128,
+        fill: "green",
+        anchor: [HorizontalAlignment.CENTER, VerticalAlignment.MIDDLE],
+        align: [HorizontalAlignment.CENTER, VerticalAlignment.MIDDLE],
+      },
+    },
+  ] satisfies DrawCall[];
+
+  executeDrawCalls(world, drawCalls);
+
+  const target = { width: window.innerWidth, height: window.innerHeight };
+  if (canvas.width !== target.width) canvas.width = target.width;
+  if (canvas.height !== target.height) canvas.height = target.height;
+  renderCtx.fillStyle = "black";
+  renderCtx.fillRect(0, 0, target.width, target.height);
+
+  const [dw, dh] =
+    target.width * 9 < target.height * 16
+      ? [target.width, (target.width * 9) / 16]
+      : [(target.height * 16) / 9, target.height];
+  renderCtx.drawImage(gameCanvas, (target.width - dw) / 2, (target.height - dh) / 2, dw, dh);
+}
+
+function main(prev: number, now: number) {
+  tick(now - prev);
+  requestAnimationFrame(() => {
+    main(now, Date.now());
+  });
+}
+
+main(Date.now(), Date.now());

@@ -5,3 +5,7 @@ packages:
 catalogs:
   base:
     typescript: ^7.0.2
+  log:
+    "@logtape/logtape": ^2.2.4
+    "@logtape/pretty": ^2.2.4
+    "@logtape/lint": ^2.2.4

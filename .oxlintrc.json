@@ -4,7 +4,13 @@
   "categories": {
     "correctness": "error"
   },
-  "rules": {},
+  "jsPlugins": [{ "name": "@logtape", "specifier": "@logtape/lint/eslint" }],
+  "rules": {
+    "@logtape/no-message-interpolation": "error",
+    "@logtape/prefer-lazy-evaluation": "warn",
+    "@logtape/no-unawaited-log": "error",
+    "@logtape/require-meta-sink": "warn"
+  },
   "env": {
     "builtin": true
   }

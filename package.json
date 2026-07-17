@@ -12,6 +12,7 @@
     "check:types": "turbo run check:types"
   },
   "devDependencies": {
+    "@logtape/lint": "catalog:log",
     "lefthook": "^2.1.10",
     "oxfmt": "^0.59.0",
     "oxlint": "^1.74.0",

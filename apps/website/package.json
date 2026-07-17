@@ -9,6 +9,10 @@
     "preview": "vite preview",
     "check:types": "tsc"
   },
+  "dependencies": {
+    "@logtape/logtape": "catalog:log",
+    "@logtape/pretty": "catalog:log"
+  },
   "devDependencies": {
     "typescript": "catalog:base",
     "vite": "^8.1.1"
