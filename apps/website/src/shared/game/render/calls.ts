@@ -1,5 +1,5 @@
-import type { Dimension2D } from "../shared/data/dimension";
-import type { Alignment, Pos2D } from "../shared/data/position";
+import type { Dimension2D } from "../../data/dimension";
+import type { Alignment, Pos2D } from "../../data/position";
 
 type DrawCallBase<Name extends string, Content extends {}> = {
   kind: Name;

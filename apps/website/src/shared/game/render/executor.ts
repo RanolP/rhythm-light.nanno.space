@@ -1,11 +1,11 @@
-import { heightOf, widthOf, type Dimension2D } from "../shared/data/dimension";
+import { heightOf, widthOf, type Dimension2D } from "../../data/dimension";
 import {
   applyTransform,
   HorizontalAlignment,
   VerticalAlignment,
   type Alignment,
   type TransformPos2D,
-} from "../shared/data/position";
+} from "../../data/position";
 import type { DrawCall } from "./calls";
 import type { World } from "./world";
 
