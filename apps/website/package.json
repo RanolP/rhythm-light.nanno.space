@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "@logtape/logtape": "catalog:log",
-    "@logtape/pretty": "catalog:log"
+    "@logtape/pretty": "catalog:log",
+    "youtube-player": "^5.6.0"
   },
   "devDependencies": {
     "typescript": "catalog:base",

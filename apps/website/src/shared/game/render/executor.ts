@@ -1,61 +1,49 @@
-import { heightOf, widthOf, type Dimension2D } from "../../data/dimension";
-import {
-  applyTransform,
-  HorizontalAlignment,
-  VerticalAlignment,
-  type Alignment,
-  type TransformPos2D,
-} from "../../data/position";
 import type { DrawCall } from "./calls";
-import type { World } from "./world";
+import type { World } from "../world";
+import { evaluateBox } from "../../data/box";
+import { applyTransform, p } from "../../data/transform";
 
 export function executeDrawCalls(w: World, calls: DrawCall[]) {
   for (const call of calls) {
+    if (!call) continue;
     switch (call.kind) {
       case "text": {
         w.renderCtx.textBaseline = "hanging";
         w.renderCtx.fillStyle = call.data.fill ?? "black";
-        w.renderCtx.font = `${call.data.fontSize ?? 16}px ${call.data.fontFamily ?? "sans-serif"}`;
+        w.renderCtx.font = `${call.data.font?.size ?? 16}px ${call.data.font?.family ?? "sans-serif"}`;
 
         const measured = w.renderCtx.measureText(call.data.content);
-        const [x, y] = applyTransform(
-          call.data.pos,
-          trAlign(w.viewport, call.data.anchor),
-          trNegate(
-            trAlign(
-              {
-                topLeft: [0, -measured.actualBoundingBoxAscent],
-                bottomRight: [measured.width, measured.actualBoundingBoxDescent],
-              },
-              call.data.align ?? [HorizontalAlignment.LEFT, VerticalAlignment.TOP],
-            ),
-          ),
-          [0, measured.actualBoundingBoxAscent],
-        );
 
-        w.renderCtx.fillText(call.data.content, x, y);
+        const size = [
+          measured.width,
+          measured.actualBoundingBoxAscent + measured.actualBoundingBoxDescent,
+        ] as const;
+        const [x, y] = evaluateBox({ origin: call.data.origin, size });
+
+        w.renderCtx.fillText(
+          call.data.content,
+          ...applyTransform([x, y], p.scale(0.5)(w.viewport.size), p.scale(-0.5)(size), [
+            measured.actualBoundingBoxLeft,
+            measured.actualBoundingBoxAscent,
+          ]),
+        );
         break;
       }
       case "box": {
-        const [x, y] = applyTransform(
-          call.data.dim.topLeft,
-          trAlign(w.viewport, call.data.anchor),
-          trNegate(
-            trAlign(
-              call.data.dim,
-              call.data.align ?? [HorizontalAlignment.LEFT, VerticalAlignment.TOP],
-            ),
-          ),
-        );
+        const [x, y, ...size] = evaluateBox(call.data);
+        const xywh = [
+          ...applyTransform([x, y], p.scale(0.5)(w.viewport.size), p.scale(-0.5)(size)),
+          ...size,
+        ] as const;
 
         if (call.data.fill) {
           w.renderCtx.fillStyle = call.data.fill;
-          w.renderCtx.fillRect(x, y, widthOf(call.data.dim), heightOf(call.data.dim));
+          w.renderCtx.fillRect(...xywh);
         }
         if (call.data.outline) {
           w.renderCtx.strokeStyle = call.data.outline.fill;
           w.renderCtx.lineWidth = call.data.outline.width;
-          w.renderCtx.strokeRect(x, y, widthOf(call.data.dim), heightOf(call.data.dim));
+          w.renderCtx.strokeRect(...xywh);
         }
         break;
       }
@@ -64,26 +52,4 @@ export function executeDrawCalls(w: World, calls: DrawCall[]) {
       }
     }
   }
-}
-
-export function trAlign(dim: Dimension2D, align: Alignment): TransformPos2D {
-  return [
-    widthOf(dim) *
-      {
-        [HorizontalAlignment.LEFT]: 0,
-        [HorizontalAlignment.CENTER]: 0.5,
-        [HorizontalAlignment.RIGHT]: 1,
-      }[align[0]],
-
-    heightOf(dim) *
-      {
-        [VerticalAlignment.TOP]: 0,
-        [VerticalAlignment.MIDDLE]: 0.5,
-        [VerticalAlignment.BOTTOM]: 1,
-      }[align[1]],
-  ];
-}
-
-export function trNegate([dx, dy]: TransformPos2D): TransformPos2D {
-  return [-dx, -dy];
 }

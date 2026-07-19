@@ -16,10 +16,10 @@ export type HorizontalAlignment = (typeof HorizontalAlignment)[keyof typeof Hori
 
 export type Alignment = [HorizontalAlignment, VerticalAlignment];
 
-export type Pos2D = [x: number, y: number];
+export type Pos2D = readonly [x: number, y: number];
 
-export type TransformPos2D = [dx: number, dy: number];
+export type PartialTransformPos2D = (pos: Pos2D) => Pos2D | null;
 
-export function applyTransform(o: Pos2D, ...tr: TransformPos2D[]): Pos2D {
-  return tr.reduce(([x, y], [dx, dy]) => [x + dx, y + dy], o);
+export function applyPartialTransform(o: Pos2D, ...tr: PartialTransformPos2D[]): Pos2D | null {
+  return tr.reduce<Pos2D | null>((p, f) => (p ? f(p) : null), o);
 }

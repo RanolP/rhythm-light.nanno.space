@@ -10,7 +10,18 @@
         margin: 0;
         padding: 0;
       }
-      #main {
+      canvas#main {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: transparent;
+      }
+      iframe#youtube {
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100vw;
         height: 100vh;
       }
@@ -18,25 +29,15 @@
     <title>website</title>
   </head>
   <body>
-    <canvas id="main"></canvas>
     <iframe
-      width="560"
-      height="315"
-      src="https://www.youtube.com/embed/mZ0ISOb2ZkQ?si=TU7mflF4o2nkLT2r&amp;controls=0"
+      id="youtube"
+      src="https://www.youtube.com/embed/mZ0ISOb2ZkQ?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=mZ0ISOb2ZkQ&controls=0&disablekb=1&fs=0&iv_load_policy=3&playsinline=1&rel=0"
       title="YouTube video player"
       frameborder="0"
-      allow="
-        accelerometer;
-        autoplay;
-        clipboard-write;
-        encrypted-media;
-        gyroscope;
-        picture-in-picture;
-        web-share;
-      "
+      allow="accelerometer; autoplay; encrypted-media"
       referrerpolicy="strict-origin-when-cross-origin"
-      allowfullscreen
     ></iframe>
+    <canvas id="main"></canvas>
     <script type="module" src="/src/app/main.ts"></script>
   </body>
 </html>

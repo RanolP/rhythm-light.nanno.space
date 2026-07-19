@@ -1,14 +1,24 @@
-import type { Pos2D } from "./position";
+import type { Box2D } from "./box";
+import { type PartialTransformPos2D } from "./position";
 
-export interface Dimension2D {
-  topLeft: Pos2D;
-  bottomRight: Pos2D;
-}
+const fit =
+  (selectFactor: (a: number, b: number) => number) =>
+  ({ parent, child }: { parent: Box2D; child: Box2D }): [Box2D, PartialTransformPos2D] => {
+    const factor = selectFactor(parent.size[0] / child.size[0], parent.size[1] / child.size[1]);
 
-export function widthOf(dim: Dimension2D) {
-  return dim.bottomRight[0] - dim.topLeft[0];
-}
+    return [
+      {
+        origin: child.origin && [
+          { scale: child.origin[0].scale, shift: factor * child.origin[0].shift },
+          { scale: child.origin[1].scale, shift: factor * child.origin[1].shift },
+        ],
+        size: [factor * child.size[0], factor * child.size[1]],
+      },
+      () => null,
+    ];
+  };
 
-export function heightOf(dim: Dimension2D) {
-  return dim.bottomRight[1] - dim.topLeft[1];
-}
+export const objectFit = {
+  cover: fit(Math.max),
+  contain: fit(Math.min),
+};
