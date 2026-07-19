@@ -12,7 +12,8 @@ export function createPointingDeviceReader(mapPos: (pos: Pos2D) => Pos2D | null)
   const devices: Record<string, PointingDeviceState> = {};
 
   const assumeDevice =
-    (then?: (e: PointerEvent, device: PointingDeviceState) => void) => (e: PointerEvent) => {
+    (then?: (e: PointerEvent, device: PointingDeviceState, position: Pos2D) => void) =>
+    (e: PointerEvent) => {
       const position = mapPos([e.clientX, e.clientY]);
       if (!position) {
         delete devices[e.pointerId];
@@ -26,14 +27,16 @@ export function createPointingDeviceReader(mapPos: (pos: Pos2D) => Pos2D | null)
         },
         control: createKeySetControl(),
       });
-      then?.(e, device);
+      then?.(e, device, position);
     };
 
   const onPointerCancel = (e: PointerEvent) => {
     delete devices[e.pointerId];
   };
 
-  const onPointerMove = assumeDevice();
+  const onPointerMove = assumeDevice((_, device, position) => {
+    device.base.position = position;
+  });
   const onPointerDown = assumeDevice((e, device) => {
     const code = mapButtonToKeyCode(e.button);
     if (code) device.control.beginPress(code, e.timeStamp);

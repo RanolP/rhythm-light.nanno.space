@@ -33,8 +33,22 @@ const SOURCE_RESOLUTION = {
   size: [1920, 1080],
 } satisfies Box2D;
 
-const pointersReader = createPointingDeviceReader(() => {
-  return resolveTargetResolution().toCanvas;
+const pointersReader = createPointingDeviceReader(([cx, cy]) => {
+  const { box: target, toCanvas } = resolveTargetResolution();
+  const dpr = window.devicePixelRatio;
+  const factor = Math.min(
+    target.size[0] / SOURCE_RESOLUTION.size[0],
+    target.size[1] / SOURCE_RESOLUTION.size[1],
+  );
+
+  const [wx, wy] = applyTransform(
+    p.scale(1 / factor)(applyTransform([cx * dpr, cy * dpr], p.scale(-1)(toCanvas))),
+  );
+
+  return Math.abs(wx) > SOURCE_RESOLUTION.size[0] / 2 ||
+    Math.abs(wy) > SOURCE_RESOLUTION.size[1] / 2
+    ? null
+    : [wx, wy];
 });
 const gameCanvas = new OffscreenCanvas(...SOURCE_RESOLUTION.size);
 const gameRenderCtx = gameCanvas.getContext("2d")!;
@@ -61,7 +75,8 @@ startGameLoop({
   },
   scene: {
     update() {},
-    render({ parentBB, frameDtMs }) {
+    render({ input, parentBB, frameDtMs }) {
+      console.log(input.pointers[0]?.position);
       recentDtSamples.push(frameDtMs);
       if (recentDtSamples.length > 20) recentDtSamples.splice(0, 1);
 
@@ -190,6 +205,18 @@ startGameLoop({
             ],
             size: [100, 128],
             outline: { fill: "blue", width: 4 },
+          },
+        },
+        input.pointers[0]?.position && {
+          kind: "box",
+          data: {
+            origin: [
+              { scale: 0, shift: 0 },
+              { scale: 0, shift: 0 },
+            ],
+            shift: input.pointers[0].position,
+            size: [100, 100],
+            fill: "white",
           },
         },
       ];
