@@ -4,6 +4,7 @@ import { startGameLoop } from "../shared/game/loop";
 import { createPointingDeviceReader } from "../shared/game/input/backend.web/pointing";
 import { evaluateBox, type Box2D } from "../shared/data/box";
 import { applyTransform, p, type Vector2D } from "../shared/data/transform";
+import { KeyCode } from "../shared/game/input/keycode";
 
 // #region Setup
 const canvas = document.querySelector<HTMLCanvasElement>("canvas#main")!;
@@ -216,7 +217,13 @@ startGameLoop({
             ],
             shift: input.pointers[0].position,
             size: [100, 100],
-            fill: "white",
+            fill: input.pointers[0].state.isPressed(KeyCode.Mouse.LEFT)
+              ? "red"
+              : input.pointers[0].state.isPressed(KeyCode.Mouse.MIDDLE)
+                ? "green"
+                : input.pointers[0].state.isPressed(KeyCode.Mouse.RIGHT)
+                  ? "blue"
+                  : "white",
           },
         },
       ];
